@@ -6,6 +6,7 @@ import(
   "os"
   "fmt"
   "strings"
+  "strconv"
 )
 
 func main() {
@@ -25,7 +26,12 @@ func main() {
 func recoverData(line string) string {
   text, code := parseLine(line)
   normalize(&text, &code)
-  return line
+  mapped := mapData(text, code)
+  var res []string
+  for i:= 1; i <= len(text); i++ {
+    res = append(res, mapped[strconv.Itoa(i)])
+  }
+  return strings.Join(res, " ")
 }
 
 func parseLine(line string) ([]string, []string){
@@ -36,8 +42,33 @@ func parseLine(line string) ([]string, []string){
 func normalize(text *[]string, code *[]string) {
   lenText := len(*text)
   lenCode := len(*code)
-  if lenText == lenCode {
+  if lenText <= lenCode {
     return
   }
-  
+  for i := 1; i <= lenText; i++ {
+    if (inArray(*code, strconv.Itoa(i))) {
+      continue
+    }
+    *code = append(*code, strconv.Itoa(i))
+    if lenText == len(*code) {
+      break
+    }
+  }
+}
+
+func inArray(haystack [] string, needle string) bool {
+  for _, v := range haystack {
+    if needle == v {
+      return true
+    }
+  }
+  return false
+}
+
+func mapData(text []string, code []string) map[string]string {
+  mapped := make(map[string]string)
+  for i := 0; i < len(text); i++ {
+    mapped[code[i]] = text[i]
+  }
+  return mapped
 }
